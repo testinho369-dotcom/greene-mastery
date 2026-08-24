@@ -53,6 +53,9 @@ const de = {
   learn: 'Lernen',
   learnSub: 'Lies die Karten — danach startet das Quiz.',
   startQuiz: 'Quiz starten',
+  reviewMistakes: 'Fehler-Karten wiederholen',
+  reviewSub: 'Nur die Karten zu deinen Fehlern — präge sie dir ein.',
+  backToResult: 'Zurück zum Ergebnis',
 }
 
 const en: typeof de = {
@@ -108,6 +111,9 @@ const en: typeof de = {
   learn: 'Learn',
   learnSub: 'Read the cards — then the quiz starts.',
   startQuiz: 'Start quiz',
+  reviewMistakes: 'Review mistake cards',
+  reviewSub: 'Only the cards behind your mistakes — let them sink in.',
+  backToResult: 'Back to results',
 }
 
 export const ui: Record<Lang, typeof de> = { de, en }

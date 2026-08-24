@@ -36,6 +36,8 @@ export default function LessonRunner({
   const cards = learnCards[lesson.id] ?? []
   const [stage, setStage] = useState<'learn' | 'quiz'>(cards.length > 0 ? 'learn' : 'quiz')
   const [cardIdx, setCardIdx] = useState(0)
+  const [reviewing, setReviewing] = useState(false)
+  const [reviewIdx, setReviewIdx] = useState(0)
   const [qi, setQi] = useState(0)
   const [phase, setPhase] = useState<Phase>('answer')
   const [sel, setSel] = useState<number | boolean | null>(null)
@@ -58,6 +60,14 @@ export default function LessonRunner({
     () => (q.t === 'match' ? shuffle(q.pairs.map((_, i) => i)) : []),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [qi, lesson.id],
+  )
+  // map each wrong question to its thematically matching learn card (both follow content order)
+  const reviewCards = useMemo(
+    () =>
+      [...new Set([...mistakes].map((m) => Math.min(cards.length - 1, Math.floor((m * cards.length) / total))))]
+        .sort((a, b) => a - b)
+        .map((i) => cards[i]),
+    [mistakes, cards, total],
   )
 
   useEffect(() => {
@@ -217,6 +227,63 @@ export default function LessonRunner({
     )
   }
 
+  /* ---------- Review phase: only the cards behind your mistakes ---------- */
+  if (finished && reviewing && reviewCards.length > 0) {
+    const card = reviewCards[Math.min(reviewIdx, reviewCards.length - 1)]
+    const last = reviewIdx >= reviewCards.length - 1
+    return (
+      <div className="mx-auto flex min-h-[calc(100dvh-57px)] max-w-2xl flex-col px-4 pb-44 pt-4">
+        <div className="flex items-center gap-3">
+          <button
+            onClick={() => setReviewing(false)}
+            className="rounded-full px-2 py-1 text-xl text-[var(--muted)] hover:bg-[var(--surface2)]"
+          >
+            ✕
+          </button>
+          <div className="h-4 flex-1 overflow-hidden rounded-full bg-[var(--surface2)]">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${Math.round(((reviewIdx + 1) / reviewCards.length) * 100)}%`, background: course.color }}
+            />
+          </div>
+          <div className="font-extrabold" style={{ color: course.color }}>
+            📖 {reviewIdx + 1}/{reviewCards.length}
+          </div>
+        </div>
+
+        <div className="mt-4 text-xs font-black uppercase tracking-widest" style={{ color: course.color }}>
+          {t.reviewMistakes} · {lesson.title[s.lang]}
+        </div>
+
+        <div key={`${lesson.id}-review-${reviewIdx}`} className="anim-slide-x mt-3 flex-1">
+          <div className="card-chunky p-6" style={{ borderColor: course.color }}>
+            <h2 className="font-display text-2xl font-bold leading-snug" style={{ color: course.color }}>
+              {card.t[s.lang]}
+            </h2>
+            <p className="mt-4 text-lg font-semibold leading-relaxed text-[var(--text)] opacity-90">{card.b[s.lang]}</p>
+          </div>
+          <p className="mt-4 text-center text-sm font-semibold text-[var(--muted)]">{t.reviewSub}</p>
+        </div>
+
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-[var(--line)] bg-[rgba(11,16,32,0.92)] backdrop-blur-md">
+          <div className="mx-auto max-w-2xl p-4">
+            <button
+              className="btn-chunky w-full py-3.5 text-lg text-white"
+              style={{ background: course.color, borderColor: course.colorDark }}
+              onClick={() => {
+                if (last) setReviewing(false)
+                else setReviewIdx((i) => i + 1)
+                sfx.click()
+              }}
+            >
+              {last ? t.backToResult : t.continueBtn}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
+  }
+
   /* ---------- Fail screen ---------- */
   if (failed && !finished) {
     return (
@@ -273,7 +340,22 @@ export default function LessonRunner({
             🔥 {t.newStreak} {s.streak}
           </p>
         )}
-        <button className="btn-chunky mt-6 w-full border-[#46A302] bg-[#58CC02] py-3.5 text-lg text-white" onClick={onDone}>
+        {mistakes.size > 0 && reviewCards.length > 0 && (
+          <button
+            className="btn-chunky mt-6 w-full border-[#33406B] bg-[var(--surface2)] py-3"
+            onClick={() => {
+              setReviewIdx(0)
+              setReviewing(true)
+              sfx.click()
+            }}
+          >
+            📖 {t.reviewMistakes} ({reviewCards.length})
+          </button>
+        )}
+        <button
+          className={`btn-chunky w-full border-[#46A302] bg-[#58CC02] py-3.5 text-lg text-white ${mistakes.size > 0 && reviewCards.length > 0 ? 'mt-3' : 'mt-6'}`}
+          onClick={onDone}
+        >
           {t.continueBtn}
         </button>
       </div>
