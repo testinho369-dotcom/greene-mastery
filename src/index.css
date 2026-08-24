@@ -1,0 +1,155 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --bg: #0b1020;
+    --surface: #131a2e;
+    --surface2: #1b2440;
+    --line: #26304f;
+    --text: #f4f1e8;
+    --muted: #8b93b0;
+    --gold: #c9a227;
+    --gold-bright: #e8c547;
+    --success: #58cc02;
+    --success-dark: #46a302;
+    --error: #ff4b4b;
+    --error-dark: #d33131;
+  }
+
+  html {
+    font-family: 'Nunito', ui-rounded, system-ui, -apple-system, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  body {
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(201, 162, 39, 0.08), transparent 60%),
+      radial-gradient(900px 500px at -10% 10%, rgba(59, 130, 246, 0.07), transparent 55%),
+      var(--bg);
+    min-height: 100dvh;
+    overflow-x: hidden;
+  }
+
+  .font-display {
+    font-family: 'Fraunces', Georgia, serif;
+    font-optical-sizing: auto;
+  }
+}
+
+@layer components {
+  /* Chunky game button — bottom edge compresses on press */
+  .btn-chunky {
+    @apply select-none touch-manipulation rounded-2xl font-extrabold tracking-wide uppercase transition-all duration-100;
+    border-bottom-width: 4px;
+    transform: translateY(0);
+  }
+  .btn-chunky:active:not(:disabled) {
+    transform: translateY(4px);
+    border-bottom-width: 0px;
+    margin-bottom: 4px;
+  }
+  .btn-chunky:disabled {
+    @apply opacity-40 cursor-not-allowed;
+  }
+
+  .card-chunky {
+    @apply rounded-3xl;
+    background: var(--surface);
+    border: 2px solid var(--line);
+  }
+
+  .node-ring {
+    box-shadow:
+      0 0 0 6px rgba(201, 162, 39, 0.18),
+      0 0 24px rgba(201, 162, 39, 0.35);
+  }
+}
+
+/* ---------- Keyframes (borrowed easings) ---------- */
+@keyframes pop-in {
+  0% { opacity: 0; transform: scale(0.75) translateY(12px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+.anim-pop {
+  animation: pop-in 0.45s cubic-bezier(0.075, 0.82, 0.165, 1) both;
+}
+
+@keyframes slide-x-in {
+  0% { opacity: 0; transform: translateX(1.25rem); }
+  100% { opacity: 1; transform: translateX(0); }
+}
+.anim-slide-x {
+  animation: slide-x-in 0.4s cubic-bezier(0.77, 0, 0.175, 1) both;
+}
+
+@keyframes sheet-up {
+  0% { transform: translateY(100%); }
+  100% { transform: translateY(0); }
+}
+.anim-sheet {
+  animation: sheet-up 0.35s cubic-bezier(0.075, 0.82, 0.165, 1) both;
+}
+
+@keyframes shake-x {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-8px); }
+  40% { transform: translateX(8px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(5px); }
+}
+.anim-shake {
+  animation: shake-x 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+@keyframes flame-pulse {
+  0%, 100% { transform: scale(1); filter: drop-shadow(0 0 0 rgba(255, 138, 0, 0)); }
+  50% { transform: scale(1.15); filter: drop-shadow(0 0 8px rgba(255, 138, 0, 0.7)); }
+}
+.anim-flame {
+  animation: flame-pulse 1.6s ease-in-out infinite;
+  display: inline-block;
+}
+
+@keyframes float-y {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+.anim-float {
+  animation: float-y 3s ease-in-out infinite;
+}
+
+@keyframes progress-fill {
+  0% { width: 0%; }
+  100% { width: var(--fill, 0%); }
+}
+.anim-fill {
+  animation: progress-fill 0.8s cubic-bezier(0.77, 0, 0.175, 1) both;
+}
+
+@keyframes crown-glow {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(232, 197, 71, 0.5)); }
+  50% { filter: drop-shadow(0 0 14px rgba(232, 197, 71, 0.9)); }
+}
+.anim-crown {
+  animation: crown-glow 2.2s ease-in-out infinite;
+}
+
+@keyframes xp-count {
+  0% { transform: scale(1.4); color: var(--gold-bright); }
+  100% { transform: scale(1); }
+}
+.anim-xp {
+  animation: xp-count 0.5s cubic-bezier(0.075, 0.82, 0.165, 1) both;
+}
+
+/* Respect reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .anim-pop, .anim-slide-x, .anim-sheet, .anim-shake, .anim-flame, .anim-float, .anim-fill, .anim-crown, .anim-xp {
+    animation-duration: 0.01s !important;
+    animation-iteration-count: 1 !important;
+  }
+}
