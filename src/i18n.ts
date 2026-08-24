@@ -50,6 +50,9 @@ const de = {
   newStreak: 'Neue Serie! Tag',
   keepGoing: 'Bleib dran — Meisterschaft ist ein Prozess.',
   installHint: 'Auf dem iPhone: Teilen → „Zum Home-Bildschirm"',
+  learn: 'Lernen',
+  learnSub: 'Lies die Karten — danach startet das Quiz.',
+  startQuiz: 'Quiz starten',
 }
 
 const en: typeof de = {
@@ -102,6 +105,9 @@ const en: typeof de = {
   newStreak: 'New streak! Day',
   keepGoing: 'Keep going — mastery is a process.',
   installHint: 'On iPhone: Share → "Add to Home Screen"',
+  learn: 'Learn',
+  learnSub: 'Read the cards — then the quiz starts.',
+  startQuiz: 'Start quiz',
 }
 
 export const ui: Record<Lang, typeof de> = { de, en }

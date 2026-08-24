@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import type { Course, Question } from '../content'
+import { learnCards } from '../content/learn'
 import { ui } from '../i18n'
 import { useStore } from '../store'
 import { sfx } from '../audio'
@@ -32,6 +33,9 @@ export default function LessonRunner({
   const lesson = course.lessons[lessonIndex]
   const total = lesson.questions.length
 
+  const cards = learnCards[lesson.id] ?? []
+  const [stage, setStage] = useState<'learn' | 'quiz'>(cards.length > 0 ? 'learn' : 'quiz')
+  const [cardIdx, setCardIdx] = useState(0)
   const [qi, setQi] = useState(0)
   const [phase, setPhase] = useState<Phase>('answer')
   const [sel, setSel] = useState<number | boolean | null>(null)
@@ -155,6 +159,62 @@ export default function LessonRunner({
         }, 500)
       }
     }
+  }
+
+  /* ---------- Learn phase: cards before the quiz ---------- */
+  if (stage === 'learn' && cards.length > 0) {
+    const card = cards[Math.min(cardIdx, cards.length - 1)]
+    const last = cardIdx >= cards.length - 1
+    return (
+      <div className="mx-auto flex min-h-[calc(100dvh-57px)] max-w-2xl flex-col px-4 pb-44 pt-4">
+        <div className="flex items-center gap-3">
+          <button onClick={onExit} className="rounded-full px-2 py-1 text-xl text-[var(--muted)] hover:bg-[var(--surface2)]">
+            ✕
+          </button>
+          <div className="h-4 flex-1 overflow-hidden rounded-full bg-[var(--surface2)]">
+            <div
+              className="h-full rounded-full transition-all duration-500"
+              style={{ width: `${Math.round(((cardIdx + 1) / cards.length) * 100)}%`, background: course.color }}
+            />
+          </div>
+          <div className="font-extrabold" style={{ color: course.color }}>
+            📖 {cardIdx + 1}/{cards.length}
+          </div>
+        </div>
+
+        <div className="mt-4 flex items-baseline justify-between">
+          <div className="text-xs font-black uppercase tracking-widest" style={{ color: course.color }}>
+            {t.learn} · {lesson.title[s.lang]}
+          </div>
+        </div>
+
+        <div key={`${lesson.id}-card-${cardIdx}`} className="anim-slide-x mt-3 flex-1">
+          <div className="card-chunky p-6" style={{ borderColor: course.color }}>
+            <h2 className="font-display text-2xl font-bold leading-snug" style={{ color: course.color }}>
+              {card.t[s.lang]}
+            </h2>
+            <p className="mt-4 text-lg font-semibold leading-relaxed text-[var(--text)] opacity-90">{card.b[s.lang]}</p>
+          </div>
+          <p className="mt-4 text-center text-sm font-semibold text-[var(--muted)]">{t.learnSub}</p>
+        </div>
+
+        <div className="fixed inset-x-0 bottom-0 z-40 border-t-2 border-[var(--line)] bg-[rgba(11,16,32,0.92)] backdrop-blur-md">
+          <div className="mx-auto max-w-2xl p-4">
+            <button
+              className="btn-chunky w-full py-3.5 text-lg text-white"
+              style={{ background: course.color, borderColor: course.colorDark }}
+              onClick={() => {
+                if (last) setStage('quiz')
+                else setCardIdx((i) => i + 1)
+                sfx.click()
+              }}
+            >
+              {last ? `🎯 ${t.startQuiz}` : t.continueBtn}
+            </button>
+          </div>
+        </div>
+      </div>
+    )
   }
 
   /* ---------- Fail screen ---------- */
