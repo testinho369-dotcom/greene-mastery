@@ -1,5 +1,5 @@
 // Greene Mastery — offline-first service worker (cache-first, same origin)
-const CACHE = 'greene-mastery-v1'
+const CACHE = 'greene-mastery-v2'
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
